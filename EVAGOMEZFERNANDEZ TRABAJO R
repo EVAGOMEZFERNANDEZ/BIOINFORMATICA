@@ -1,0 +1,196 @@
+
+#1. Carga los datos y exáminalos en R. Emplea las funciones head(), summary(), dim() y str(). 
+#¿Cuántas variables hay? ¿Cuántos tratamientos?
+
+#Metemos la variable y abrimos nuestros datos del archivo .txt para comprobar que esta bien
+>  load("C:\\Users\\evago\\OneDrive\\Escritorio\\TRABAJO R\\.RData")
+
+#Examinamos los datos con estas funciones:
+
+> head(datos)
+> summary(datos)
+> dim(datos)
+> str(datos)
+
+-Hay 5 tratamientos y 2 variables 
+
+#2. Haz un boxplot para nuestros datos. Uno para cada variable. Colorea a Variable 1 y a 
+#Variable 2 de forma diferente (guarda esos colores para las siguientes gráficas)
+
+#Vamos a distinguir los boxplots de las variables gracias a estos colores: Variable 1: rosa; Variable 2: green
+#Creamos el primer boxplot seleccionando las columnas de interés
+
+> boxplot(Variable1~Tratamiento, data=datos, col=c("pink"), main= "boxplot-trabajoR1")
+> boxplot(Variable2~Tratamiento, data=datos, col=c("blue"), main= "boxplot-trabajoR2")
+
+
+#3. Haz un gráfico de dispersión con las dos variables. Cada tratamiento debe de ir de 
+#un color distinto. ¡Como en la siguiente imagen!
+
+> plot(datos$Variable1, datos$Variable2, col = datos$Tratamiento, pch = 19, xlab = "Variable1", ylab = "Variable2", main = "Gráfico de dispersión")
+
+#4. Ponle leyenda al gráfico del apartado anterior. En el margen inferior derecho. 
+#Pista: investiga sobre legend()
+#Utilizando el mismo comando cambio el título del gráfico anterior.
+
+#para especificar que tiene leyenda
+
+> plot(datos$Variable1, datos$Variable2, col = datos$Tratamiento, pch = 19, xlab = "Variable1", ylab = "Variable2", main = "Gráfico de dispersión con leyenda")
+
+#Mientras sigue nuestra ventana del gráfico abierta, usamos el siguiente comando
+
+> legend("bottomright", legend = unique(datos$Tratamiento), col = unique(datos$Tratamiento), pch = 19, title = "Tratamiento")
+
+#5. Haz un histograma para cada variable. Recuerda mantener los colores.
+
+> hist(datos$Variable1, col = "pink", main = "Histograma Variable 1", xlab = "Variable1", ylab = "Frecuencia")
+> hist(datos$Variable2, col = "blue", main = "Histograma Variable 2", xlab = "Variable 2", ylab = "Frecuencia")
+
+#6. Haz un factor en la columna tratamiento y guárdalo en una variable. 
+#Pista: factor(factor$Tratamiento)
+
+#En función de de la columna tratamiento creo el factor:
+> FactorTratamiento = factor (datos$Tratamiento)
+
+#Ahora voy a comprobar
+> FactorTratamiento
+
+
+
+#7. Calcula la media y la desviación estándar para cada tratamiento. Recomendación: es
+más fácil si usas aggregate() o tapply().
+#• aggregate(Variable~factor,datos,función)
+#• tapply(datos$Variable,factor,función)
+
+#Vamos a hacerlo primero con la variable 1
+
+#media
+> aggregate(Variable1~FactorTratamiento,datos,mean)
+
+#Desviación estandar
+> aggregate(Variable1~FactorTratamiento,datos,sd)
+
+Las medias encontradas son:4.00;4.90;8,77;50,80;34,90.
+Las desviaciones son:  1.290133; 3.754997;3.857475; 11.113555; 8.633912.
+
+
+#Vamos a hacerlo con la variable 2:
+#media
+> aggregate(Variable2~FactorTratamiento,datos,mean)
+
+#desviación estandar
+> aggregate(Variable2~FactorTratamiento,datos,sd)
+La media encontrada :  0.510; 1.300; 5.310; 8.730; 9.018
+La desviación estandar:  0.2884826; 0.4189935; 1.3568346; 1.3333750; 1.2146769
+
+
+
+#8. Averigua cuántos elementos tiene cada tratamiento. Recomendación: es más fácil si
+#usas table() con el factor
+
+#para saberlo utilizamos:
+> table(FactorTratamiento)
+
+Cada tratamiento tiene 10  elementos 
+
+
+#9. Extrae los datos para el tratamiento 1 y el tratamiento 4 y guárdalos cada uno en una
+#variable diferente.
+
+#tratamiento 1:
+> Tratamiento1 = datos [1:10, ]
+#Para comprobar:
+> Tratamiento1
+
+#Ahora tratamiento 4:
+> Tratamiento4 = datos [31:40, ]
+#Para compruebar:
+> Tratamiento4
+
+
+#10. Nuestra hipótesis nula es que las medias de tratamiento 1 y tratamiento 4 para la
+#Variable 1 son iguales. ¿Puedes comprobarlo? Para ello, necesitarás comprobar
+#primero si los datos se distribuyen de forma normal. En función del resultado de la
+#prueba de normalidad, ¿qué test usarías? ** En general, asumimos que las muestras
+#son independientes, pero ¿son sus varianzas iguales? Actúa de acuerdo a tus
+#resultados.
+
+Primero vamos a comprabar si las columnas de tratamiento y la variable se distribuyen de manera normal
+
+#la columna de tratamiento:
+> distribucionnormal <- shapiro.test(datos$Tratamiento)
+
+#miramos el p value
+>p_valor <- distribucionnormal$p.value
+>if (p_valor < 0.05) {
+  cat("Los datos no siguen una distribución normal (p-valor =", p_valor, ")\n")
+} else {
+  cat("Los datos siguen una distribución normal (p-valor =", p_valor, ")\n")
+}
+
+Los datos no siguen una distribución normal, debido a que el p value es p=0.000204409
+
+Seguidamente vamos a mirar la columna de variable 1:
+> distribucionnormal2 <- shapiro.test(datos$Variable1)
+
+Luego compruebamos mostrando el p value:
+> p_valor <- distribucionnormal2$p.value
+>if (p_valor < 0.05) {
+  + cat("Los datos no siguen una distribución normal (p-valor =", p_valor, ")\n")
+} else {
+  + cat("Los datos siguen una distribución normal (p-valor =", p_valor, ")\n")
+}
+
+Finalmente vemos que los datos no siguen una distribución normal, ya que el p value es p=9.522027e-06
+
+
+Vamos a hacer la prueba de Mann-Whitney-Wilcoxon, porque los datos no siguen una distribución normal.Calculamos las medias en función de la variable1, y las guardo como una variable nueva.
+> MediaT1 = aggregate(Variable1~Tratamiento,Tratamiento1,mean)
+> print(MediaT1)
+
+La media del tratamiento 1 en función de la variable 1 es 4.
+
+#ahora lo hacemos para el tratamiento 4:
+> MediaT4 = aggregate(Variable1~Tratamiento,Tratamiento4,mean)
+> print(MediaT4)
+
+La media del tratamiento 4 en función de la variable 1 es 50.8
+
+#comparamos ambas:
+> MT1vsMT4 <- wilcox.test(MediaT1$Variable1, MediaT4$Variable)
+
+# compruebo si son iguales y muestreo el p-value
+> p_valor <- MT1vsMT4$p.value
+> if (p_valor < 0.05) {
+  + cat("Las medias de las dos variables son diferentes (p-valor =", p_valor, ")\n")
+} else {
+  + cat("No hay evidencia para afirmar que las medias de las dos variables son diferentes (p-valor =", p_valor, ")\n")
+}
+
+En función de los datos anteriores,como la p.value= 1, no hay evidencia para decir que la media del tratamiento 4 y la media del tratamiento 1 para la variable 1 son diferentes. Por lo tanto son iguales.
+Asumiendo que las muestras son independientes, calculamos la varianza para el tratamiento 1 y el tratamiento 4, sabiendo que no seguimos una distribución normal (sigo el mismo proceso)
+
+#Calculo la varianza del tratamiento 1
+> VarianzaT1 = aggregate(Variable1~Tratamiento,Tratamiento1,var)
+> VarianzaT1
+La varianza para el tratamiento 1 de la variable 1 es 1.66
+
+#Calculo la varianza del tratamiento 4
+> VarianzaT4 = aggregate(Variable1~Tratamiento,Tratamiento4,var)
+> VarianzaT4
+La varianza para el tratamiento 4 es 123.51
+
+
+>VT1vsVT4 <- wilcox.test(VarianzaT1$Variable1, VarianzaT4$Variable1)
+Hacemos esto para compararlas
+
+>p_valor <- VT1vsVT4$p.value
+>if (p_valor < 0.05) {
+ + cat("Las varianzas de las dos variables son diferentes (p-valor =", p_valor, ")\n")
+} else {
+ + cat("No hay evidencia para afirmar que las varianzas de las dos variables son diferentes (p-valor =", p_valor, ")\n")
+}
+
+Como nuestra p.value=1. Según nuestros resultados las varianzas serían iguales.
+
+
